@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eid Mubarak - Salami Spin & Special Gift</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Hind+Siliguri:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- External Scripts for Confetti and HTML2Canvas -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* ================= COLOR THEMES ================= */
+        :root {
+            --bg-start: #064E3B; 
+            --bg-end: #022C22;
+            --bg-alt: #047857;
+            --accent: #FBBF24; 
+            --accent-glow: rgba(251, 191, 36, 0.7);
+            --text-main: #ffffff;
+            --mosque-tint: #022C22;
+            --pattern-op: 0.15;
+        }
+
+        body.theme-midnight {
+            --bg-start: #0f172a;
+            --bg-end: #020617;
+            --bg-alt: #1e1b4b;
+            --accent: #e2e8f0;
+            --accent-glow: rgba(226, 232, 240, 0.6);
+            --mosque-tint: #0f172a;
+            --pattern-op: 0.1;
+        }
+
+        body.theme-sunset {
+            --bg-start: #7c2d12;
+            --bg-end: #450a0a;
+            --bg-alt: #9a3412;
+            --accent: #fde047;
+            --accent-glow: rgba(253, 224, 71, 0.7);
+            --mosque-tint: #3f0909;
+            --pattern-op: 0.2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(-45deg, var(--bg-start), var(--bg-end), var(--bg-alt));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+            overflow-x: hidden;
+            padding: 20px 0 60px 0; 
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .theme-selector {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .theme-selector label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .theme-selector select {
+            background: transparent;
+            color: white;
+            border: none;
+            outline: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .theme-selector select option {
+            color: #000;
+        }
+
+        /* ================= CARD STYLES ================= */
+        .card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(0,0,0,0.6));
+            backdrop-filter: blur(20px);
+            width: 100%;
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(255,255,255,0.1);
+            min-height: 560px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            text-align: center;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            transition: all 0.5s ease;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(var(--accent) 1px, transparent 1px), radial-gradient(var(--accent) 1px, transparent 1px);
+            background-position: 0 0, 20px 20px;
+            background-size: 40px 40px;
+            opacity: var(--pattern-op);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -30%; left: -30%;
+            width: 160%; height: 160%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 60%);
+            opacity: 0.25;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .moon-icon {
+            position: absolute;
+            top: 25px; right: 25px;
+            width: 70px; height: 70px;
+            animation: float 4s ease-in-out infinite;
+            z-index: 1;
+            filter: drop-shadow(0 0 15px var(--accent-glow));
+        }
+
+        .star {
+            position: absolute;
+            fill: var(--accent);
+            animation: twinkle 3s infinite alternate;
+            z-index: 1;
+        }
+        .star-1 { top: 40px; left: 40px; width: 20px; height: 20px; animation-delay: 0s; }
+        .star-2 { top: 120px; right: 100px; width: 12px; height: 12px; animation-delay: 1s; }
+        .star-3 { top: 100px; left: 80px; width: 15px; height: 15px; animation-delay: 0.5s; }
+
+        .shemai-bowl {
+            position: absolute;
+            bottom: 120px; right: 20px;
+            width: 80px; height: 80px;
+            z-index: 2;
+            animation: float 5s ease-in-out infinite reverse;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+        }
+
+        .mosque-bg {
+            position: absolute;
+            bottom: -5px; left: 0;
+            width: 100%;
+            z-index: 1;
+            opacity: 0.95;
+            filter: drop-shadow(0 -5px 15px rgba(0,0,0,0.5));
+        }
+
+        .mosque-fill {
+            fill: var(--mosque-tint);
+            transition: fill 0.5s ease;
+        }
+
+        .card-content {
+            z-index: 5;
+            width: 100%;
+            position: relative;
+        }
+        
+        .eid-badge {
+            display: inline-block;
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid var(--accent);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        h1.title {
+            font-family: 'Amiri', serif;
+            font-size: 3.8rem;
+            color: var(--accent);
+            margin-bottom: 0px;
+            text-shadow: 0 4px 20px var(--accent-glow);
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+
+        .title-bn {
+            font-family: 'Hind Siliguri', sans-serif;
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 25px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            opacity: 0.9;
+            color: #e2e8f0;
+            font-weight: 300;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .name-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            background: rgba(0,0,0,0.7);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent), #d97706);
+            color: #000;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 20px var(--accent-glow);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .btn-primary:active { transform: scale(0.95); }
+        .btn-primary:hover { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 8px 25px var(--accent-glow); }
+
+        .wish-result {
+            display: none;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .wish-result .name-highlight {
+            font-size: 2.4rem;
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #ffffff;
+            display: block;
+            margin: 5px 0;
+            font-weight: 700;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.8);
+            word-wrap: break-word;
+        }
+
+        .sender-signature {
+            margin: 15px auto 25px auto;
+            position: relative;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 25px;
+            border-radius: 30px;
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .sender-prefix {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            font-weight: 400;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .sender-signature-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-shadow: 0px 4px 15px var(--accent-glow);
+            letter-spacing: 1px;
+        }
+
+        .wish-message {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            min-height: 80px;
+            padding: 0 15px;
+            color: #f8fafc;
+            font-weight: 400;
+            transition: opacity 0.3s ease;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+        }
+
+        .btn-change-wish {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            margin-top: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+        .btn-change-wish:hover { background: rgba(255, 255, 255, 0.2); border-color: var(--accent); }
+
+        .actions-wrapper {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-download { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(5px); }
+        .btn-download:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-2px); }
+        
+        .share-row { display: flex; gap: 10px; }
+        .btn-wa { background: #25D366; flex: 1; }
+        .btn-wa:hover { background: #1ebc5b; transform: translateY(-2px); }
+        .btn-messenger { background: #0084FF; flex: 1; }
+        .btn-messenger:hover { background: #0073e0; transform: translateY(-2px); }
+
+        .btn-gift {
+            background: linear-gradient(45deg, #f43f5e, #f59e0b);
+            color: white;
+            animation: pulse-gift 2s infinite;
+            border: 2px solid #fff;
+        }
+        .btn-gift:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        .btn-reset {
+            background: linear-gradient(45deg, #6366f1, #a855f7);
+            color: white;
+            padding: 16px 20px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+            animation: pulse-reset 3s infinite;
+        }
+        .btn-reset:hover { 
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ================= GIFT OVERLAY ================= */
+        .gift-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .gift-overlay.active { display: flex; opacity: 1; }
+
+        .gift-box {
+            background: linear-gradient(135deg, #022C22, #064E3B);
+            padding: 35px 20px;
+            border-radius: 20px;
+            text-align: center;
+            color: #ffffff;
+            max-width: 90%;
+            width: 350px;
+            transform: scale(0.8);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            position: relative;
+            border: 3px solid #FBBF24;
+        }
+        .gift-overlay.active .gift-box { transform: scale(1); }
+        
+        .gift-title { font-size: 2.2rem; color: #FBBF24; margin-bottom: 5px; font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+        .gift-desc { font-size: 1.1rem; color: #e2e8f0; margin-bottom: 25px; line-height: 1.6; }
+        .close-gift { position: absolute; top: 10px; right: 15px; font-size: 1.8rem; color: #cbd5e1; cursor: pointer; transition: 0.3s; }
+        .close-gift:hover { color: #f43f5e; }
+
+        .wheel-container {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            margin: 0 auto 20px auto;
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid #FBBF24;
+            position: relative;
+            overflow: hidden;
+            background-color: #ffffff; 
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+        }
+        .wheel-bg-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            border-radius: 50%;
+        }
+        .wheel-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            border-radius: 50%;
+            z-index: 1; 
+        }
+        .segment {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 50%;
+            height: 30px;
+            margin-top: -15px;
+            transform-origin: left center;
+            text-align: right;
+            padding-right: 15px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            box-sizing: border-box;
+        }
+        .pointer {
+            position: absolute;
+            top: 50%;
+            right: -10px;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-right: 25px solid #ffffff;
+            z-index: 10;
+            filter: drop-shadow(-2px 0px 5px rgba(0,0,0,0.8));
+        }
+        #spinBtn { width: 100%; border-radius: 30px; }
+        #downloadSalamiBtn {
+            width: 100%; border-radius: 30px; background: linear-gradient(45deg, #10b981, #059669); color: white; border: none; padding: 15px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4); transition: all 0.3s ease; margin-top: 10px;
+        }
+        #downloadSalamiBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.6); }
+
+        /* Animations */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-gift { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
+        @keyframes pulse-reset { 0%, 100% { box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); } 50% { box-shadow: 0 5px 25px rgba(99, 102, 241, 0.8); } }
+    </style>
+</head>
+<body class="theme-ramadan" id="appBody">
+
+    <div class="app-wrapper">
+        <div class="theme-selector">
+            <i class="fa-solid fa-palette"></i>
+            <label for="themeSelect">Vibes:</label>
+            <select id="themeSelect" onchange="changeTheme()">
+                <option value="ramadan">Classic Ramadan</option>
+                <option value="midnight">Midnight Stars</option>
+                <option value="sunset">Sunset Glow</option>
+            </select>
+        </div>
+
+        <div class="card" id="greetingCard">
+            <svg class="star star-1" viewBox="0 0 24 24"><path d="M12 0l3.09 8.91L24 12l-8.91 3.09L12 24l-3.09-8.91L0 12l8.91-3.09z"/></svg>
+            <svg class="star star-2" viewBox="0 0 24 24"><path d="M12 0l3.09 8.91L24 12l-8.91 3.09L12 24l-3.09-8.91L0 12l8.91-3.09z"/></svg>
+            <svg class="star star-3" viewBox="0 0 24 24"><path d="M12 0l3.09 8.91L24 12l-8.91 3.09L12 24l-3.09-8.91L0 12l8.91-3.09z"/></svg>
+
+            <svg class="moon-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 5 A45 45 0 1 0 95 50 A35 35 0 1 1 50 5 Z" fill="var(--accent)"/>
+            </svg>
+
+            <svg class="shemai-bowl" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="40" fill="var(--accent-glow)" opacity="0.3" filter="blur(10px)"/>
+                <ellipse cx="50" cy="65" rx="35" ry="10" fill="#000" opacity="0.3"/>
+                <path d="M15 40 Q50 90 85 40 Z" fill="var(--accent)"/>
+                <path d="M15 40 Q50 55 85 40 Q50 25 15 40 Z" fill="#d97706"/>
+                <path d="M25 38 Q35 20 45 38 T65 35 T75 38" stroke="#fef08a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <path d="M30 42 Q40 25 55 40 T70 42" stroke="#fef08a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <circle cx="45" cy="32" r="2.5" fill="#22c55e"/>
+                <circle cx="55" cy="35" r="2" fill="#22c55e"/>
+                <circle cx="50" cy="28" r="2" fill="#ef4444"/>
+                <path d="M40 20 Q35 10 45 0" stroke="#fff" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round"/>
+                <path d="M60 22 Q65 12 55 2" stroke="#fff" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round"/>
+            </svg>
+
+            <div class="mosque-bg">
+                <svg viewBox="0 0 800 200" preserveAspectRatio="none" style="width:100%; height:160px;" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="var(--mosque-tint)" opacity="0.6" d="M100,200 L100,120 C100,120 150,50 200,50 C250,50 300,120 300,120 L300,200 Z" />
+                    <path fill="var(--mosque-tint)" opacity="0.6" d="M500,200 L500,120 C500,120 550,50 600,50 C650,50 700,120 700,120 L700,200 Z" />
+                    <path class="mosque-fill" d="M0,200 L0,150 L30,150 L30,80 L45,50 L60,80 L60,150 L250,150 C250,150 320,40 400,40 C480,40 550,150 550,150 L740,150 L740,80 L755,50 L770,80 L770,150 L800,150 L800,200 Z" />
+                </svg>
+            </div>
+
+            <div class="card-content">
+                <span class="eid-badge"><i class="fa-solid fa-star-and-crescent"></i> Festival of Joy</span>
+                <h1 class="title">Eid Mubarak</h1>
+                <h2 class="title-bn">ঈদ মোবারক</h2>
+                
+                <div id="inputSection">
+                    <p class="subtitle" style="font-family: 'Hind Siliguri', sans-serif;">কার জন্য কার্ড বানাচ্ছেন এবং আপনার নাম দিন!</p>
+                    <div class="controls">
+                        <input type="text" id="nameInput" class="name-input" placeholder="বন্ধুর নাম (যাকে পাঠাবেন)" autocomplete="off"/>
+                        <input type="text" id="senderNameInput" class="name-input" placeholder="আপনার নাম (যিনি পাঠাচ্ছেন)" autocomplete="off"/>
+                        
+                        <button class="btn-primary" onclick="generateWish()">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> কার্ড তৈরি করুন
+                        </button>
+                    </div>
+                </div>
+
+                <div id="resultSection" class="wish-result">
+                    <span class="name-highlight" id="displayName"></span> 
+                    
+                    <div class="sender-signature">
+                        <span class="sender-prefix"><i class="fa-solid fa-pen-nib"></i> ভালোবাসা ও শুভেচ্ছান্তে-</span>
+                        <div class="sender-signature-text" id="displaySenderName"></div>
+                    </div>
+                    
+                    <div id="wishMessage" class="wish-message">ঈদের এই পবিত্র দিনে তোমার জীবন ভরে উঠুক অনাবিল আনন্দে, সাথে থাকুক মিষ্টি শেমাইয়ের স্বাদ। মহান আল্লাহ তোমার সকল নেক আশা কবুল করুন। 🌙 ঈদ মোবারক!</div>
+                    
+                    <button class="btn-change-wish" onclick="changeWishMessage()" id="changeTextBtn">
+                        <i class="fa-solid fa-feather"></i> লেখা পরিবর্তন করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-wrapper" id="actionsSection">
+            <button class="btn-action btn-gift" onclick="openGift()">
+                <i class="fa-solid fa-gift"></i> সালামি স্পিন করুন 🎁
+            </button>
+
+            <button class="btn-action btn-reset" onclick="resetApp()">
+                <i class="fa-solid fa-paper-plane"></i> আপনার বন্ধুকে সালামি পাঠান
+            </button>
+
+            <button class="btn-action btn-download" onclick="downloadImage()">
+                <i class="fa-solid fa-download"></i> কার্ড সেভ করুন
+            </button>
+            
+            <div class="share-row" id="shareRow" style="display: none;">
+                <button class="btn-action btn-wa" onclick="shareWhatsApp()">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </button>
+                <button class="btn-action btn-messenger" onclick="shareMessenger()">
+                    <i class="fa-brands fa-facebook-messenger"></i> Messenger
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Special Gift Modal (Spin Wheel) -->
+    <div class="gift-overlay" id="giftOverlay">
+        <div class="gift-box" id="giftBoxInner">
+            <span class="close-gift" onclick="closeGift()">&times;</span>
+            <h2 class="gift-title">সালামি স্পিন!</h2>
+            <p class="gift-desc" id="giftDescText">স্পিন করুন এবং আপনার সালামি জিতে নিন!</p>
+            
+            <div class="wheel-container">
+                <div class="pointer"></div>
+                <div class="wheel" id="wheel">
+                    <svg class="wheel-bg-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 50 L50 0 A50 50 0 0 1 85.355 14.645 Z" fill="#ef4444" />
+                        <path d="M50 50 L85.355 14.645 A50 50 0 0 1 100 50 Z" fill="#f97316" />
+                        <path d="M50 50 L100 50 A50 50 0 0 1 85.355 85.355 Z" fill="#eab308" />
+                        <path d="M50 50 L85.355 85.355 A50 50 0 0 1 50 100 Z" fill="#84cc16" />
+                        <path d="M50 50 L50 100 A50 50 0 0 1 14.645 85.355 Z" fill="#10b981" />
+                        <path d="M50 50 L14.645 85.355 A50 50 0 0 1 0 50 Z" fill="#06b6d4" />
+                        <path d="M50 50 L0 50 A50 50 0 0 1 14.645 14.645 Z" fill="#3b82f6" />
+                        <path d="M50 50 L14.645 14.645 A50 50 0 0 1 50 0 Z" fill="#8b5cf6" />
+                    </svg>
+                    <div class="wheel-text">
+                        <div class="segment" style="transform: rotate(22.5deg);">১ ৳</div>
+                        <div class="segment" style="transform: rotate(67.5deg);">১০ ৳</div>
+                        <div class="segment" style="transform: rotate(112.5deg);">৫০ ৳</div>
+                        <div class="segment" style="transform: rotate(157.5deg);">১০০ ৳</div>
+                        <div class="segment" style="transform: rotate(202.5deg);">৫০০ ৳</div>
+                        <div class="segment" style="transform: rotate(247.5deg);">১০০০ ৳</div>
+                        <div class="segment" style="transform: rotate(292.5deg);">৫০০০ ৳</div>
+                        <div class="segment" style="transform: rotate(337.5deg);">১০০ ৳</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="spinBtn" onclick="startSpin()">স্পিন করুন</button>
+            <button id="downloadSalamiBtn" style="display: none;" onclick="downloadSalami()">
+                <i class="fa-solid fa-download"></i> সালামি সেভ করুন
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Functions -->
+    <script>
+        const wishes =[
+            "ঈদের এই পবিত্র দিনে তোমার জীবন ভরে উঠুক অনাবিল আনন্দে, সাথে থাকুক মিষ্টি শেমাইয়ের স্বাদ। মহান আল্লাহ তোমার সকল নেক আশা কবুল করুন। 🌙 ঈদ মোবারক!",
+            "নতুন চাঁদ, নতুন দিন, আজ হলো খুশির দিন। ঈদ এসেছে হাসিমুখে, আনন্দ থাকুক তোমার বুকে। 🕌 ঈদ মোবারক!",
+            "ঈদের আনন্দ ছড়িয়ে পড়ুক তোমার জীবনের প্রতিটি প্রান্তে। পরিবার ও আপনজনদের নিয়ে সুন্দর কাটুক তোমার ঈদ। ✨ ঈদ মোবারক!",
+            "এক মাসের সিয়াম সাধনার পর এলো খুশির ঈদ। এই আনন্দঘন মুহূর্তে তোমার সব দুঃখ-কষ্ট দূর হয়ে যাক। 💫 ঈদ মোবারক!",
+            "দূরত্ব যতই হোক, হৃদয়ের টান কখনো কমে না। আমার অন্তরের অন্তস্তল থেকে তোমার জন্য রইলো ঈদের একরাশ ভালোবাসা। 💖 ঈদ মোবারক!"
+        ];
+        let currentWishIndex = 0;
+        let isSpinning = false;
+        let generateWishClicks = 0; // কার্ড তৈরি করুন ক্লিকের সংখ্যা ট্র্যাকিং
+
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const name = params.get("name");
+            const sender = params.get("sender");
+
+            if(name && sender){
+                document.getElementById("nameInput").value = name;
+                document.getElementById("senderNameInput").value = sender;
+                setupCard(name, sender, false); 
+            } else if (name) {
+                document.getElementById("nameInput").value = name;
+                document.getElementById("senderNameInput").value = "তোমার বন্ধু";
+                setupCard(name, "তোমার বন্ধু", false);
+            }
+        };
+
+        function changeTheme() {
+            const theme = document.getElementById('themeSelect').value;
+            document.getElementById('appBody').className = `theme-${theme}`;
+        }
+
+        function fireConfetti() {
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors:['#FBBF24', '#ffffff', '#10b981'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors:['#FBBF24', '#ffffff', '#10b981'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        function setupCard(name, sender, isCreator = false) {
+            document.getElementById('displayName').innerText = name;
+            document.getElementById('displaySenderName').innerText = sender;
+            
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('actionsSection').style.display = 'flex';
+            document.getElementById('shareRow').style.display = isCreator ? 'flex' : 'none';
+
+            fireConfetti();
+        }
+
+        function generateWish() {
+            const nameInput = document.getElementById('nameInput');
+            const senderInput = document.getElementById('senderNameInput');
+            const name = nameInput.value.trim();
+            const sender = senderInput.value.trim();
+            let hasError = false;
+
+            if(!name) { showError(nameInput); hasError = true; }
+            if(!sender) { showError(senderInput); hasError = true; }
+            if(hasError) return;
+
+            // অ্যাড লজিক: প্রথম ক্লিকে অ্যাড ওপেন হবে
+            if (generateWishClicks === 0) {
+                const adLink = "https://www.effectivegatecpm.com/ze1wnu9j4?key=dd8416dea3c46a4330cdfef8c14870e6";
+                window.open(adLink, '_blank');
+                generateWishClicks++;
+                return; // এখানে ফাংশন থামিয়ে দেবে, কার্ড তৈরি করবে না
+            }
+
+            // দ্বিতীয় ক্লিকের পর কার্ড তৈরি হবে
+            try {
+                let currentUrl = window.location.href.split('?')[0];
+                let shareUrl = currentUrl + "?name=" + encodeURIComponent(name) + "&sender=" + encodeURIComponent(sender);
+                window.history.pushState({}, "", shareUrl);
+            } catch (e) { console.warn("URL Update failed"); }
+
+            setupCard(name, sender, true);
+        }
+
+        function showError(element) {
+            element.style.border = "2px solid #ef4444";
+            element.style.boxShadow = "0 0 15px rgba(239, 68, 68, 0.5)";
+            setTimeout(() => { element.style.border = "2px solid rgba(255,255,255,0.2)"; }, 1000);
+        }
+
+        function changeWishMessage() {
+            currentWishIndex = (currentWishIndex + 1) % wishes.length;
+            const wishEl = document.getElementById('wishMessage');
+            wishEl.style.opacity = 0;
+            setTimeout(() => {
+                wishEl.innerText = wishes[currentWishIndex];
+                wishEl.style.opacity = 1;
+            }, 300);
+        }
+
+        function openGift() {
+            document.getElementById('giftOverlay').classList.add('active');
+            const savedAmount = localStorage.getItem('salamiAmount');
+
+            if (savedAmount) {
+                document.getElementById('spinBtn').style.display = 'none';
+                document.getElementById('downloadSalamiBtn').style.display = 'block';
+                document.getElementById('giftDescText').innerHTML = `আপনি আগেই স্পিন করেছেন এবং <br><b style="color: #FBBF24; font-size: 1.8rem;">${savedAmount} ৳</b><br> পেয়েছেন! 🎉`;
+            } else {
+                const wheel = document.getElementById('wheel');
+                wheel.style.transition = 'none';
+                wheel.style.transform = `rotate(0deg)`;
+                void wheel.offsetWidth; 
+                
+                document.getElementById('spinBtn').style.display = 'block';
+                document.getElementById('downloadSalamiBtn').style.display = 'none';
+                isSpinning = false;
+                
+                const name = document.getElementById('nameInput').value.trim() || "বন্ধু";
+                document.getElementById('giftDescText').innerHTML = `প্রিয় <b style="color: #FBBF24;">${name}</b>, স্পিন করুন এবং আপনার সালামি জিতে নিন!`;
+            }
+        }
+
+        function closeGift() {
+            document.getElementById('giftOverlay').classList.remove('active');
+        }
+
+        function startSpin() {
+            if(isSpinning) return;
+            
+            // স্পিন বাটনে ক্লিক করলে অ্যাড ওপেন হবে
+            const adLink = "https://www.effectivegatecpm.com/ze1wnu9j4?key=dd8416dea3c46a4330cdfef8c14870e6";
+            window.open(adLink, '_blank');
+
+            isSpinning = true;
+            
+            const S = Math.floor(Math.random() * 8) + 1;
+            const amounts = {1: "১", 2: "১০", 3: "৫০", 4: "১০০", 5: "৫০০", 6: "১০০০", 7: "৫০০০", 8: "১০০"};
+            const A = (S - 1) * 45 + 22.5;
+            const absoluteRotation = 360 * 5 + (360 - A);
+
+            const wheel = document.getElementById('wheel');
+            wheel.style.transition = 'transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            wheel.style.transform = `rotate(${absoluteRotation}deg)`;
+            
+            setTimeout(() => {
+                isSpinning = false;
+                const wonAmount = amounts[S];
+                localStorage.setItem('salamiAmount', wonAmount);
+
+                document.getElementById('giftDescText').innerHTML = `অভিনন্দন! আপনি পেয়েছেন <br><b style="color: #FBBF24; font-size: 2rem; text-shadow: 0 2px 10px rgba(251,191,36,0.6);">${wonAmount} ৳</b><br> সালামি! 🎉`;
+                document.getElementById('spinBtn').style.display = 'none';
+                document.getElementById('downloadSalamiBtn').style.display = 'block';
+                
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }, 4000);
+        }
+
+        function downloadSalami() {
+            const giftBoxInner = document.getElementById('giftBoxInner');
+            const dlBtn = document.getElementById('downloadSalamiBtn');
+            const closeBtn = document.querySelector('.close-gift');
+
+            dlBtn.style.display = 'none'; closeBtn.style.display = 'none';
+
+            setTimeout(() => {
+                html2canvas(giftBoxInner, { scale: 3, useCORS: true, backgroundColor: null }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Eid_Salami.png`;
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.click();
+                    dlBtn.style.display = 'block'; closeBtn.style.display = 'block';
+                });
+            }, 100);
+        }
+
+        function downloadImage() {
+            const card = document.getElementById('greetingCard');
+            const btn = document.querySelector('.btn-download');
+            const changeBtn = document.getElementById('changeTextBtn');
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> সেভ হচ্ছে...';
+            changeBtn.style.display = 'none'; 
+            
+            const originalBg = card.style.background;
+            const bgStart = getComputedStyle(document.body).getPropertyValue('--bg-start').trim();
+            const bgEnd = getComputedStyle(document.body).getPropertyValue('--bg-end').trim();
+            card.style.background = `linear-gradient(135deg, ${bgStart}, ${bgEnd})`;
+
+            setTimeout(() => {
+                html2canvas(card, { scale: 3, useCORS: true, backgroundColor: null }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Eid_Mubarak_From_${document.getElementById('senderNameInput').value.trim()}.png`;
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.click();
+                    
+                    btn.innerHTML = '<i class="fa-solid fa-download"></i> কার্ড সেভ করুন';
+                    changeBtn.style.display = 'inline-block';
+                    card.style.background = originalBg;
+                });
+            }, 300);
+        }
+
+        function getShareText() {
+            const name = document.getElementById('nameInput').value.trim() || "বন্ধু";
+            const sender = document.getElementById('senderNameInput').value.trim() || "আমি";
+            const url = window.location.href; 
+            return `আরেহ ${name}! 🤩\n\n${sender} তোমার জন্য ঈদের স্পেশাল সালামি আর একটা সারপ্রাইজ গিফট পাঠিয়েছে! 🎁💸\n\nজলদি নিচের লিংকে ক্লিক করে তোমার সালামি স্পিন করে তুলে নাও! দেরি করলে কিন্তু মিস! 👇\n${url}`;
+        }
+
+        function shareWhatsApp() {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareText())}`, '_blank');
+        }
+
+        function shareMessenger() {
+            const text = getShareText();
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert("মেসেজটি অটোমেটিক কপি করা হয়েছে! 🎁\n\nএখন Messenger ওপেন হলে শুধু মেসেজ বক্সে 'Paste (পেস্ট)' করে সেন্ড করে দিন।");
+                });
+            } else { 
+                alert("দয়া করে লিংকটি কপি করে মেসেঞ্জারে শেয়ার করুন।"); 
+            }
+            
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) { 
+                window.location.href = `fb-messenger://share/?link=${encodeURIComponent(window.location.href)}`; 
+            } else { 
+                window.open('https://www.messenger.com/', '_blank'); 
+            }
+        }
+
+        function resetApp() {
+            document.getElementById('nameInput').value = '';
+            document.getElementById('senderNameInput').value = '';
+            document.getElementById('inputSection').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('actionsSection').style.display = 'none';
+            generateWishClicks = 0; // রিসেট করলে ক্লিক কাউন্টারও রিসেট হবে
+            closeGift();
+            localStorage.removeItem('salamiAmount');
+            try { window.history.pushState({}, "", window.location.href.split('?')[0]); } catch (e) {}
+        }
+    </script>
+</body>
+</html>
