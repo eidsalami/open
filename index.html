@@ -691,7 +691,7 @@
         ];
         let currentWishIndex = 0;
         let isSpinning = false;
-        let generateWishClicks = 0; // কার্ড তৈরি করুন ক্লিকের সংখ্যা ট্র্যাকিং
+        let downloadClicks = 0; // ডাউনলোড ক্লিকের সংখ্যা ট্র্যাকিং
 
         window.onload = function() {
             const params = new URLSearchParams(window.location.search);
@@ -748,15 +748,7 @@
             if(!sender) { showError(senderInput); hasError = true; }
             if(hasError) return;
 
-            // অ্যাড লজিক: প্রথম ক্লিকে অ্যাড ওপেন হবে
-            if (generateWishClicks === 0) {
-                const adLink = "https://www.effectivegatecpm.com/ze1wnu9j4?key=dd8416dea3c46a4330cdfef8c14870e6";
-                window.open(adLink, '_blank');
-                generateWishClicks++;
-                return; // এখানে ফাংশন থামিয়ে দেবে, কার্ড তৈরি করবে না
-            }
-
-            // দ্বিতীয় ক্লিকের পর কার্ড তৈরি হবে
+            // অ্যাড লজিক সরানো হয়েছে
             try {
                 let currentUrl = window.location.href.split('?')[0];
                 let shareUrl = currentUrl + "?name=" + encodeURIComponent(name) + "&sender=" + encodeURIComponent(sender);
@@ -812,7 +804,7 @@
         function startSpin() {
             if(isSpinning) return;
             
-            // স্পিন বাটনে ক্লিক করলে অ্যাড ওপেন হবে
+            // স্পিন বাটনে অ্যাড লজিক রাখা হয়েছে (বা চাইলে এটাও সরাতে পারেন)
             const adLink = "https://www.effectivegatecpm.com/ze1wnu9j4?key=dd8416dea3c46a4330cdfef8c14870e6";
             window.open(adLink, '_blank');
 
@@ -859,6 +851,14 @@
         }
 
         function downloadImage() {
+            // অ্যাড লজিক: প্রথম ক্লিকে অ্যাড ওপেন হবে
+            if (downloadClicks === 0) {
+                const adLink = "https://www.effectivegatecpm.com/ze1wnu9j4?key=dd8416dea3c46a4330cdfef8c14870e6";
+                window.open(adLink, '_blank');
+                downloadClicks++;
+                return; 
+            }
+
             const card = document.getElementById('greetingCard');
             const btn = document.querySelector('.btn-download');
             const changeBtn = document.getElementById('changeTextBtn');
@@ -920,7 +920,7 @@
             document.getElementById('inputSection').style.display = 'block';
             document.getElementById('resultSection').style.display = 'none';
             document.getElementById('actionsSection').style.display = 'none';
-            generateWishClicks = 0; // রিসেট করলে ক্লিক কাউন্টারও রিসেট হবে
+            downloadClicks = 0; // রিসেট করলে ক্লিক কাউন্টারও রিসেট হবে
             closeGift();
             localStorage.removeItem('salamiAmount');
             try { window.history.pushState({}, "", window.location.href.split('?')[0]); } catch (e) {}
